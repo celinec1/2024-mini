@@ -13,7 +13,7 @@ import urequests
 url = "https://www.howsmyssl.com/a/check"
 DNS = "8.8.8.8"
 
-ssid = ""
+ssid = "Celine Chen"
 # Fill in the SSID of your WiFi Hotspot or network
 
 passw = ""
