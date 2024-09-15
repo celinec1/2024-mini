@@ -6,9 +6,10 @@ from machine import Pin
 import time
 import random
 import json
+import urequests
 
 
-N: int = 3
+N: int = 10
 sample_ms = 10.0
 on_ms = 500
 
@@ -52,12 +53,30 @@ def scorer(t: list[int | None]) -> None:
 
     t_good = [x for x in t if x is not None]
 
-    print(t_good)
+    # print(t_good)
 
     # add key, value to this dict to store the minimum, maximum, average response time
     # and score (non-misses / total flashes) i.e. the score a floating point number
     # is in range [0..1]
-    data = {}
+    if t_good:
+        avg_response_time = sum(t_good) / len(t_good)
+        minimum = min(t_good)
+        maximum = max(t_good)
+    else:
+        avg_response_time = minimum = maximum = None
+
+    score = (len(t_good) / len(t)) if t else 0.0
+    data = {
+        "minimum": minimum,
+        "maximum": maximum,
+        "average_response_time": avg_response_time,
+        "score": score,
+    }
+
+    print(f"Average response time: {avg_response_time} ms")
+    print(f"Minimum response time: {minimum} ms")
+    print(f"Maximum response time: {maximum} ms")
+    print(f"Score: {score}")
 
     # %% make dynamic filename and write JSON
 
@@ -69,6 +88,11 @@ def scorer(t: list[int | None]) -> None:
     print("write", filename)
 
     write_json(filename, data)
+
+    api = "https://miniproject-game-default-rtdb.firebaseio.com/scores.json"
+    
+    response = urequests.post(api, json=data)
+    response_data = response.json()
 
 
 if __name__ == "__main__":
